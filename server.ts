@@ -23,12 +23,12 @@ app.post('/sign-in', (req: Request, res:Response)=> {
         .where(
             'email', '=', req.body.email
         )
-        .then(data => {
+        .then((data: { hash: string; }[]) => {
           const isValid = bcrypt.compareSync(req.body.password, data[0].hash)
             if(isValid){
                 return db.select('*').from('users')
                     .where('email', '=', req.body.email)
-                    .then(user => {
+                    .then((user: any[]) => {
                         res.json(user[0])
                     })
                     .catch(() => res.status(400).json('unable to get user'))
@@ -68,7 +68,7 @@ app.post('/register', (req: Request, res: Response)=> {
 app.get('/profile/:id', (req, res) => {
     const { id } = req.params;
     db.select('*').from('users').where({id})
-        .then(user => {
+        .then((user: string | any[]) => {
             if (user.length) {
                 res.json(user[0])
             } else {
@@ -83,7 +83,7 @@ app.put('/image', (req, res) =>{
     db('users').where('id', '=', id)
         .increment('entries', 1)
         .returning('entries')
-        .then(entries => {
+        .then((entries: any[][]) => {
             res.json(entries[0].entries)
         })
         .catch(() => res.status(400).json('unable to get entries'))
