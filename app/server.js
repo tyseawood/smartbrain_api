@@ -1,7 +1,8 @@
-const express = require('express')
-const cors = require('cors')
-const bcrypt = require('bcrypt')
-const knex = require('knex')
+import express from 'express';
+import cors from 'cors'
+import bcrypt from 'bcrypt'
+import pkg from "knex";
+const { knex } = pkg
 
 const db = knex({
     client: 'pg',
