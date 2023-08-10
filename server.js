@@ -1,7 +1,8 @@
-import express, {Application, Response, Request} from 'express'
+import express from 'express';
 import cors from 'cors'
 import bcrypt from 'bcrypt'
-import { knex } from "knex";
+import pkg from "knex";
+const { knex } = pkg
 
 const db = knex({
     client: 'pg',
@@ -13,22 +14,22 @@ const db = knex({
     }
 })
 
-const app: Application =  express()
+const app = express()
 
 app.use(express.json())
 app.use(cors())
 
-app.post('/sign-in', (req: Request, res:Response)=> {
+app.post('/sign-in', (req , res)=> {
     db.select('email', 'hash').from('login')
         .where(
             'email', '=', req.body.email
         )
-        .then((data: { hash: string; }[]) => {
+        .then((data) => {
           const isValid = bcrypt.compareSync(req.body.password, data[0].hash)
             if(isValid){
                 return db.select('*').from('users')
                     .where('email', '=', req.body.email)
-                    .then((user: any[]) => {
+                    .then((user) => {
                         res.json(user[0])
                     })
                     .catch(() => res.status(400).json('unable to get user'))
@@ -39,7 +40,7 @@ app.post('/sign-in', (req: Request, res:Response)=> {
         .catch(() => res.status(400).json('wrong credentials'))
 })
 
-app.post('/register', (req: Request, res: Response)=> {
+app.post('/register', (req, res)=> {
     const { email, name, password } = req.body;
     const hash = bcrypt.hashSync(password, 10)
     db.transaction(trx => {
@@ -68,7 +69,7 @@ app.post('/register', (req: Request, res: Response)=> {
 app.get('/profile/:id', (req, res) => {
     const { id } = req.params;
     db.select('*').from('users').where({id})
-        .then((user: string | any[]) => {
+        .then((user) => {
             if (user.length) {
                 res.json(user[0])
             } else {
@@ -83,7 +84,7 @@ app.put('/image', (req, res) =>{
     db('users').where('id', '=', id)
         .increment('entries', 1)
         .returning('entries')
-        .then((entries: any[][]) => {
+        .then((entries) => {
             res.json(entries[0].entries)
         })
         .catch(() => res.status(400).json('unable to get entries'))
