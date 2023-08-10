@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors'
 import bcrypt from 'bcrypt'
-import { knex } from 'knex'
+import pkg from 'knex'
+const { knex } = pkg
 
 const db = knex({
     client: 'pg',
